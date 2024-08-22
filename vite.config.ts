@@ -10,4 +10,14 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    server: {
+        proxy: {
+            '/api': {
+                target: process.env.VITE_API || 'http://localhost:8080',
+                changeOrigin: true,
+                secure: false,
+                ws: true,
+            },
+        },
+    }
 })
