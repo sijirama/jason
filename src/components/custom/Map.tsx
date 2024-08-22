@@ -17,9 +17,6 @@ export default function MapComponent() {
     const { alerts } = useAlertStore()
     const auth = useAuthUser();
 
-    if (!coords?.longitude || !coords.latitude) {
-        return null
-    }
 
     const alertsMarkers = useMemo(() => alerts.map((alert) => {
         return (
@@ -32,6 +29,10 @@ export default function MapComponent() {
         )
     }), [alerts])
 
+    if (!coords?.longitude || !coords.latitude) {
+        return null
+    }
+
     return (
         <section className='w-full h-full'>
             <Map
@@ -39,9 +40,10 @@ export default function MapComponent() {
                 mapboxAccessToken={import.meta.env.VITE_MAPBOX_KEY}
                 initialViewState={{
                     longitude: coords?.longitude,
-                    latitude: coords?.longitude,
-                    zoom: 10
+                    latitude: coords?.latitude,
+                    zoom: 15
                 }}
+                //onClick={handleMapClick}
                 style={{ width: "100%", height: "100vh" }}
                 mapStyle={MapBoxSiji}
             >
