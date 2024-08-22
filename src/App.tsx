@@ -1,5 +1,3 @@
-import { Button } from "./components/ui/button";
-import { useInterface } from "./store/interface";
 import { socket } from "./lib/socket";
 import { useGeolocated } from "react-geolocated";
 import { useEffect } from "react";
@@ -9,7 +7,6 @@ import useAlertStore from "./store/alert";
 import FloatingMenu from "./components/custom/FloatingMenu";
 
 function App() {
-    const { onOpen } = useInterface();
     const { coords } = useGeolocated();
     const { addAlert } = useAlertStore();
 
@@ -54,8 +51,6 @@ function App() {
     return (
         <main className="font-poppins">
             <FloatingMenu />
-            {socket.connected ? <Button>Connected {socket.id || "id"}</Button> : <Button>Disconnected</Button>}
-            <Button onClick={() => onOpen("signInForm")}>Enter</Button>
         </main>
     );
 }

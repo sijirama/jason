@@ -12,7 +12,7 @@ export default function SideViewLayout({ children }: SideViewLayourProps) {
             <section className='hidden xl:block transition-all duration-300 lg:w-1/4 p-4'>
                 <AlertsSide />
             </section>
-            <section className='bg-gray-400 flex-1'>{children}</section>
+            <section className='bg-slate-200 flex-1'>{children}</section>
         </main>
     )
 }
