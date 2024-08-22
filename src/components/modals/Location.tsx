@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { useGeolocated } from 'react-geolocated';
 import {
     Dialog,
     DialogContent,
