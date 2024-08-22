@@ -47,7 +47,7 @@ const Userbutton = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-fit">
                     <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => onOpen("alertSheet")}>
+                        <DropdownMenuItem className='lg:hidden' onClick={() => onOpen("alertSheet")}>
                             <AlertCircle className="mr-2 h-4 w-4" />
                             <span>View alerts</span>
                         </DropdownMenuItem>

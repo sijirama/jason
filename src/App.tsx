@@ -52,12 +52,12 @@ function App() {
     }, [coords]);
 
     return (
-        <>
+        <main className="font-poppins">
             <Userbutton />
             {socket.connected ? <Button>Connected {socket.id || "id"}</Button> : <Button>Disconnected</Button>}
             <Button onClick={() => onOpen("signInForm")}>Enter</Button>
             <p>{coords?.latitude + " : " + coords?.longitude}</p>
-        </>
+        </main>
     );
 }
 

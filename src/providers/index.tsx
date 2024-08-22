@@ -6,6 +6,7 @@ import {
 import { InterfaceProvider } from "./interface-provider";
 import AuthProvider from "./auth";
 import { Toaster } from "@/components/ui/sonner"
+import SideViewLayout from "@/layout/SideView";
 
 interface Provider {
     children: ReactNode
@@ -20,9 +21,11 @@ export default function index({ children }: Provider) {
         <>
             <AuthProvider>
                 <QueryClientProvider client={queryClient}>
-                        <InterfaceProvider />
+                    <InterfaceProvider />
+                    <SideViewLayout>
                         {children}
-                        <Toaster />
+                    </SideViewLayout>
+                    <Toaster />
                 </QueryClientProvider>
             </AuthProvider>
         </>
