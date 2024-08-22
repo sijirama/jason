@@ -5,6 +5,7 @@ import { create } from 'zustand';
 export type InterfaceType =
 	| 'signInForm'
 	| 'alertSheet'
+	| 'reportAlert'
 
 export interface InterfaceDataType {
 	// creator?: User | null;

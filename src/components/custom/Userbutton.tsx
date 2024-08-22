@@ -1,6 +1,5 @@
-
 import useSignOut from 'react-auth-kit/hooks/useSignOut';
-import { AlertCircle, LogOut } from 'lucide-react';
+import { AlertCircle, LogOut, MicIcon } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -35,7 +34,7 @@ const Userbutton = () => {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div
-                        className={`cursor-pointer rounded-full w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-center bg-cover bg-no-repeat border ${socket.connected
+                        className={`cursor-pointer rounded-full sm:w-10 sm:h-10 bg-center bg-cover bg-no-repeat border ${socket.connected
                             ? 'border-green-500 border-2'
                             : 'border-purple-300'
                             }`}
@@ -47,7 +46,12 @@ const Userbutton = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-fit">
                     <DropdownMenuGroup>
-                        <DropdownMenuItem className='lg:hidden' onClick={() => onOpen("alertSheet")}>
+                        <DropdownMenuItem className='lg:hiddenn' onClick={() => onOpen("reportAlert")}>
+                            <MicIcon className="mr-2 h-4 w-4" />
+                            <span>Report alert</span>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem className='lg:hiddenn' onClick={() => onOpen("alertSheet")}>
                             <AlertCircle className="mr-2 h-4 w-4" />
                             <span>View alerts</span>
                         </DropdownMenuItem>

@@ -52,7 +52,7 @@ export const LocationManager: React.FC = () => {
                         : 'bg-red-500 hover:bg-red-600'
                         }`}
                 >
-                    <FaMapMarkerAlt className="text-white" size={24} />
+                    <FaMapMarkerAlt className="text-white" size={22} />
                 </button>
             </div>
             <LocationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} getPosition={getPosition} />

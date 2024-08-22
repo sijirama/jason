@@ -1,4 +1,3 @@
-import Userbutton from "./components/custom/Userbutton";
 import { Button } from "./components/ui/button";
 import { useInterface } from "./store/interface";
 import { socket } from "./lib/socket";
@@ -12,7 +11,7 @@ import FloatingMenu from "./components/custom/FloatingMenu";
 function App() {
     const { onOpen } = useInterface();
     const { coords } = useGeolocated();
-    const { addAlert, alerts } = useAlertStore();
+    const { addAlert } = useAlertStore();
 
     useEffect(() => {
         // Ensure that socket connection is established
@@ -57,7 +56,6 @@ function App() {
             <FloatingMenu />
             {socket.connected ? <Button>Connected {socket.id || "id"}</Button> : <Button>Disconnected</Button>}
             <Button onClick={() => onOpen("signInForm")}>Enter</Button>
-            <p>{coords?.latitude + " : " + coords?.longitude}</p>
         </main>
     );
 }

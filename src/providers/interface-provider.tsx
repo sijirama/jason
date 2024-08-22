@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import SignUpForm from "@/components/modals/SignIn"
-import LocationModal from "@/components/modals/Location";
 import AlertSheet from "@/components/modals/alertsSheet";
+import ReportAlert from "@/components/modals/ReportAlert";
 
 export function InterfaceProvider() {
     const [isMounted, setIsMounted] = useState(false);
@@ -18,8 +18,8 @@ export function InterfaceProvider() {
     return (
         <>
             <SignUpForm />
-            <LocationModal />
             <AlertSheet />
+            <ReportAlert />
         </>
     );
 }

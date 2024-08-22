@@ -15,7 +15,7 @@ export default function AlertsSide() {
     }, [alerts]);
 
     return (
-        <div className="lg:h-[calc(100vh-150px)] overflow-y-auto hide-scrollbar">
+        <div className="h-[calc(100vh-150px)] overflow-y-auto hide-scrollbar">
             <div>
                 <AnimatePresence>
                     {alerts.map((alert) => (
