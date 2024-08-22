@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { joinAlertRoom } from "./lib/alerts";
 import { Alert } from "./types/alert";
 import useAlertStore from "./store/alert";
+import FloatingMenu from "./components/custom/FloatingMenu";
 
 function App() {
     const { onOpen } = useInterface();
@@ -53,7 +54,7 @@ function App() {
 
     return (
         <main className="font-poppins">
-            <Userbutton />
+            <FloatingMenu />
             {socket.connected ? <Button>Connected {socket.id || "id"}</Button> : <Button>Disconnected</Button>}
             <Button onClick={() => onOpen("signInForm")}>Enter</Button>
             <p>{coords?.latitude + " : " + coords?.longitude}</p>

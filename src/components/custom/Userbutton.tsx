@@ -31,7 +31,7 @@ const Userbutton = () => {
     }
 
     return (
-        <div className="fixed top-4 right-4 lg:right-36 z-50">
+        <div className="">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div

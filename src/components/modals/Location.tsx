@@ -7,29 +7,19 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '../ui/button';
+import { useLocationStore } from '@/store/location';
 
-const LocationModal = () => {
-    const [isModalOpen, setIsModalOpen] = useState(true);
-    const {
-        coords,
-        isGeolocationAvailable,
-        isGeolocationEnabled,
-        getPosition,
-        positionError,
-    } = useGeolocated({
-        positionOptions: {
-            enableHighAccuracy: true,
-        },
-        watchPosition: true,
-        onError: (error) => {
-            console.error('Geolocation Error:', error);
-        },
-    });
+interface LocationModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    getPosition: () => void;
+}
 
-    const shouldShowModal = !isGeolocationAvailable || !isGeolocationEnabled || !coords;
+export default function LocationModal({ isOpen, onClose, getPosition }: LocationModalProps) {
+    const { coords, isGeolocationAvailable, isGeolocationEnabled, positionError } = useLocationStore();
 
     return (
-        <Dialog open={isModalOpen && shouldShowModal} onOpenChange={setIsModalOpen}>
+        <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="bg-white rounded-lg shadow-lg w-full max-w-md px-6 py-8">
                 <DialogHeader className="border-b border-gray-200 pb-4 mb-4">
                     <DialogTitle className="text-lg font-medium">Location Required</DialogTitle>
@@ -55,10 +45,10 @@ const LocationModal = () => {
                     )}
                 </div>
                 <div className="flex justify-end mt-6 space-x-2">
-                    <Button onClick={() => getPosition()} variant="default">
+                    <Button onClick={getPosition} variant="default">
                         Get Location Manually
                     </Button>
-                    <Button onClick={() => setIsModalOpen(false)} variant="secondary">
+                    <Button onClick={onClose} variant="secondary">
                         Close
                     </Button>
                 </div>
@@ -67,4 +57,3 @@ const LocationModal = () => {
     );
 };
 
-export default LocationModal;
