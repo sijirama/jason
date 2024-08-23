@@ -10,7 +10,7 @@ import MapComponent from "./components/custom/Map";
 function App() {
     const { coords } = useGeolocated();
     const { addAlert } = useAlertStore();
-    const radius = 1000
+    const radius = 1000000
 
     useEffect(() => {
         socket.connect();

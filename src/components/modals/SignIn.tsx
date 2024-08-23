@@ -30,7 +30,7 @@ export default function SignInFormModal() {
 
     useEffect(() => {
         if (isAuthenticated && open) {
-            console.log(auth, isAuthenticated)
+            //console.log(auth, isAuthenticated)
             onClose()
         }
     }, [open, auth, isAuthenticated])

@@ -1,80 +1,103 @@
-import { useEffect, useState } from 'react';
-import { AiOutlineWarning } from 'react-icons/ai';
-import { FiMapPin, FiClock } from 'react-icons/fi';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Skeleton } from '../ui/skeleton';
+import React, { useEffect, useState, useCallback } from 'react';
+import { AlertTriangle, MapPin, Clock, AlertCircle, ThumbsUp, MessageSquare } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/types/alert';
+import moment from 'moment';
 
 interface ReportCardProps {
-    id?: string;
+    id?: number;
     open?: boolean;
 }
 
-export default function ReportCard({ id }: ReportCardProps) {
-    const [alert, setAlert] = useState<any>(null);
+const fetchAlertData = async (alertId: number): Promise<Alert | null> => {
+    try {
+        const response = await fetch(`/api/alert/${alertId}`);
+        const data = await response.json();
+        return data.alert;
+    } catch (error) {
+        console.error('Error fetching alert data:', error);
+        return null;
+    }
+};
+
+const ReportCard = React.memo(({ id }: ReportCardProps) => {
+    const [alert, setAlert] = useState<Alert | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const fetchAlert = useCallback(async () => {
         if (id) {
-            fetchAlertData(id);
+            setLoading(true);
+            const data = await fetchAlertData(id);
+            setAlert(data);
+            setLoading(false);
         }
     }, [id]);
 
-    const fetchAlertData = async (alertId: string) => {
-        try {
-            const response = await fetch(`/api/alerts/${alertId}`);
-            const data = await response.json();
-            setAlert(data.alert);
-        } catch (error) {
-            console.error('Error fetching alert data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        fetchAlert();
+    }, [fetchAlert]);
 
     if (loading) {
         return (
-            <Card>
-                <CardHeader>
-                    <Skeleton className="w-full h-8" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="w-full h-6 mb-2" />
-                    <Skeleton className="w-full h-6" />
-                </CardContent>
-            </Card>
+            <div className="p-4">
+                <Skeleton className="w-full h-6 mb-2" />
+                <Skeleton className="w-3/4 h-4 mb-2" />
+                <Skeleton className="w-full h-20" />
+            </div>
         );
     }
 
     if (!alert) {
         return (
-            <Card>
-                <CardContent className="text-center">
-                    <p>No alert found</p>
-                </CardContent>
-            </Card>
+            <div className="p-4 text-center">
+                <AlertCircle className="mx-auto mb-2 text-gray-400" size={32} />
+                <p className="text-gray-600">No alert found</p>
+            </div>
         );
     }
 
-    return (
-        <Card>
-            <CardHeader>
-                <div className="flex items-center space-x-2">
-                    <AiOutlineWarning className="text-red-600 text-xl" />
-                    <CardTitle>{alert.title}</CardTitle>
-                </div>
-                <CardDescription className="flex items-center space-x-1 mt-1">
-                    <FiMapPin className="text-gray-500" />
-                    <span>{alert.location}</span>
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center space-x-2">
-                    <FiClock className="text-gray-500" />
-                    <span>{new Date(alert.createdAt).toLocaleString()}</span>
-                </div>
-                <p className="mt-4">{alert.description}</p>
-            </CardContent>
-        </Card>
-    );
-}
+    const urgencyColor = alert.Urgency > 7 ? "text-red-600" : alert.Urgency > 4 ? "text-orange-500" : "text-yellow-500";
+    const formattedDate = moment(alert.CreatedAt).format('Do [of] MMM [around] h:mm A');
 
+    return (
+        <div className="p-4 font-poppins">
+            <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                        <AlertTriangle className={`${urgencyColor} text-xl`} />
+                        <h2 className="text-lg font-bold tracking-tight text-gray-800">{alert.Title}</h2>
+                    </div>
+                    <Badge variant="outline" className={`${urgencyColor} text-xs border-current`}>
+                        Urgency: {alert.Urgency}/10
+                    </Badge>
+                </div>
+                <p className="flex items-center space-x-1 text-xs text-gray-600">
+                    <MapPin className="w-4 h-4" />
+                    <span>{alert.Location.Latitude.toFixed(4)}, {alert.Location.Longitude.toFixed(4)}</span>
+                </p>
+            </div>
+
+            <div className="mb-4">
+                <p className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Reported {formattedDate}</span>
+                </p>
+                <p className="text-gray-700">{alert.Description}</p>
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-gray-500 border-t border-gray-200 pt-3">
+                <div className="flex items-center space-x-2">
+                    <ThumbsUp className="w-4 h-4" />
+                    <span>{alert.Verifications?.length || 0} Verifications</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>{alert.Comments?.length || 0} Comments</span>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+export default ReportCard;

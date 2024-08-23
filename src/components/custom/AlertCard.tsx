@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Alert } from '@/types/alert';
 import { useGeolocated } from "react-geolocated";
 import { FaMapMarkerAlt, FaChevronDown, FaChevronUp, FaClock, FaExclamationTriangle } from 'react-icons/fa';
+import { useInterface } from '@/store/interface';
 
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Radius of the Earth in km
@@ -19,6 +20,7 @@ export const AlertCard: React.FC<{ alert: Alert }> = ({ alert }) => {
     const [expanded, setExpanded] = useState(false);
     const { coords } = useGeolocated();
     const [distance, setDistance] = useState<number | null>(null)
+    const { onOpen } = useInterface()
 
     useEffect(() => {
         if (coords) {
@@ -32,6 +34,7 @@ export const AlertCard: React.FC<{ alert: Alert }> = ({ alert }) => {
 
     return (
         <motion.div
+            onClick={() => onOpen("reportCard", { alertId: alert.ID })}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
