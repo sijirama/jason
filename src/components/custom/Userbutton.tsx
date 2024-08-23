@@ -25,7 +25,7 @@ const Userbutton = () => {
         signOut();
     };
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !auth) {
         return null;
     }
 

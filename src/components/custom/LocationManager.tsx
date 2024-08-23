@@ -12,6 +12,7 @@ export const LocationManager: React.FC = () => {
     const { coords, isGeolocationAvailable, isGeolocationEnabled, getPosition, positionError } = useGeolocated({
         positionOptions: {
             enableHighAccuracy: true,
+            maximumAge: 0,
         },
         watchPosition: true,
         onSuccess: (position) => {

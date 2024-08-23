@@ -9,6 +9,7 @@ import { avatarImageUrl } from '@/lib/avatar';
 import { User } from '@/types';
 import { socket } from '@/lib/socket';
 import { useMemo } from 'react';
+import AlertMarker from './AlertMarker';
 
 const MapBoxSiji = "mapbox://styles/sijiramakun/cm04mgec700ej01qtc1ekexg4"
 
@@ -20,17 +21,17 @@ export default function MapComponent() {
 
     const alertsMarkers = useMemo(() => alerts.map((alert) => {
         return (
-            <Marker key={alert.ID} latitude={alert.Location.Latitude} longitude={alert.Location.Longitude}>
-                <div className="bg-red-500 p-2 rounded-full text-white">
-                    {alert.Title}
-                </div>
-            </Marker>
-
+            <AlertMarker alert={alert} />
         )
     }), [alerts])
 
     if (!coords?.longitude || !coords.latitude) {
         return null
+    }
+
+    const handleMapClick = (event: any) => {
+        // Add alert to the map
+        console.log('Map clicked', event.lngLat);
     }
 
     return (
@@ -41,9 +42,9 @@ export default function MapComponent() {
                 initialViewState={{
                     longitude: coords?.longitude,
                     latitude: coords?.latitude,
-                    zoom: 15
+                    zoom: 18
                 }}
-                //onClick={handleMapClick}
+                onClick={handleMapClick}
                 style={{ width: "100%", height: "100vh" }}
                 mapStyle={MapBoxSiji}
             >

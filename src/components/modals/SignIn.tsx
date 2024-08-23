@@ -33,7 +33,7 @@ export default function SignInFormModal() {
             console.log(auth, isAuthenticated)
             onClose()
         }
-    }, [open])
+    }, [open, auth, isAuthenticated])
 
     if (isDesktop) {
         return (

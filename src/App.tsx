@@ -10,13 +10,14 @@ import MapComponent from "./components/custom/Map";
 function App() {
     const { coords } = useGeolocated();
     const { addAlert } = useAlertStore();
+    const radius = 1000
 
     useEffect(() => {
         socket.connect();
         socket.on("connect", () => {
             console.log('Connected to socket server');
             if (coords) {
-                joinAlertRoom(coords.latitude, coords.longitude, 1000);
+                joinAlertRoom(coords.latitude, coords.longitude, radius);
             }
         });
         socket.on("alert", (data: Alert) => {
@@ -36,7 +37,7 @@ function App() {
 
     useEffect(() => {
         if (coords) {
-            joinAlertRoom(coords.latitude, coords.longitude, 1000);
+            joinAlertRoom(coords.latitude, coords.longitude, radius);
         }
     }, [coords]);
 

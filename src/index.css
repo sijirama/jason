@@ -79,3 +79,36 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.pulse-circle {
+  position: absolute;
+  background-color: rgba(255, 0, 0, 0.2); /* More transparent red */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-animation 2s infinite ease-in-out;
+}
+
+.pulse-inner {
+  width: 50%;
+  height: 50%;
+  background-color: rgba(255, 0, 0, 0.4); /* Slightly less transparent inner circle */
+  border-radius: 50%;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0.7;
+  }
+}
+
