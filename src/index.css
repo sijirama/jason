@@ -112,3 +112,7 @@
   }
 }
 
+
+.mapboxgl-user-location-dot, .mapboxgl-user-location-accuracy-circle {
+    display: none;
+}

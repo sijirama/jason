@@ -34,7 +34,7 @@ const Userbutton = () => {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div
-                        className={`cursor-pointer rounded-full sm:w-10 sm:h-10 bg-center bg-cover bg-no-repeat border ${socket.connected
+                        className={`cursor-pointer rounded-full w-10 h-10 bg-center bg-cover bg-no-repeat border ${socket.connected
                             ? 'border-green-500 border-2'
                             : 'border-purple-300'
                             }`}
