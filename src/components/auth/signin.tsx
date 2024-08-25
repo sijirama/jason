@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useInterface } from '@/store/interface';
 
 const signInSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -24,6 +25,7 @@ const signInSchema = z.object({
 
 const SignInForm = () => {
 
+    const { onOpen } = useInterface()
     const signIn = useSignIn();
 
     const form = useForm({
@@ -61,8 +63,8 @@ const SignInForm = () => {
     };
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <Form {...form} >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 font-poppins">
                 <FormField
                     control={form.control}
                     name="email"
@@ -91,6 +93,9 @@ const SignInForm = () => {
                     )}
                 />
                 <Button type="submit">Sign In</Button>
+                <div onClick={() => onOpen("signUpForm")}>
+                    <p>if you're new to chookeye, Register</p>
+                </div>
             </form>
         </Form>
     );

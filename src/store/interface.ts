@@ -4,6 +4,7 @@ import { create } from 'zustand';
 
 export type InterfaceType =
     | 'signInForm'
+    | 'signUpForm'
     | 'alertSheet'
     | 'reportAlert'
     | 'reportCard'
