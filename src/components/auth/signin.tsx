@@ -25,7 +25,7 @@ const signInSchema = z.object({
 
 const SignInForm = () => {
 
-    const { onOpen } = useInterface()
+    const { onOpen, onClose } = useInterface()
     const signIn = useSignIn();
 
     const form = useForm({
@@ -35,6 +35,15 @@ const SignInForm = () => {
             password: '',
         },
     });
+
+    const callToSignUp = () => {
+        onClose()
+        setTimeout(() => {
+            onOpen("signUpForm")
+        }
+            , 100
+        )
+    }
 
     const onSubmit = async (values: z.infer<typeof signInSchema>) => {
         try {
@@ -51,6 +60,7 @@ const SignInForm = () => {
                         user,
                     },
                 });
+                onClose()
                 toast.success('Login successful');
             } else {
                 toast.error('Login failed: please try later');
@@ -93,7 +103,7 @@ const SignInForm = () => {
                     )}
                 />
                 <Button type="submit">Sign In</Button>
-                <div onClick={() => onOpen("signUpForm")}>
+                <div className='w-full p-1 flex items-center text-xs cursor-pointer justify-center bg-slate-200 rounded-lg'  onClick={callToSignUp}>
                     <p>if you're new to chookeye, Register</p>
                 </div>
             </form>

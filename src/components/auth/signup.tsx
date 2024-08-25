@@ -28,7 +28,7 @@ const signUpSchema = z.object({
 const SignUpForm = () => {
     const [isUsernameTaken, setIsUsernameTaken] = useState(false);
     const [isUsernameValid, setIsUsernameValid] = useState(false);
-    const { onOpen } = useInterface();
+    const { onOpen, onClose } = useInterface();
 
     const form = useForm({
         resolver: zodResolver(signUpSchema),
@@ -38,6 +38,16 @@ const SignUpForm = () => {
             password: '',
         },
     });
+
+    const callToSignIn = () => {
+        onClose()
+        setTimeout(() => {
+            onOpen("signInForm")
+        }
+            , 100
+        )
+    }
+
 
     const checkUsername = useCallback(
         debounce(async (username: string) => {
@@ -76,7 +86,7 @@ const SignUpForm = () => {
             const response = await axios.post('/api/auth/signup', values);
             if (response.status === 201) {
                 toast.success('Sign up successful');
-                onOpen("signInForm");
+                callToSignIn()
             } else {
                 toast.error('Sign up failed: please try again later');
             }
@@ -143,6 +153,9 @@ const SignUpForm = () => {
                     )}
                 />
                 <Button type="submit" disabled={!isFormValid}>Sign Up</Button>
+                <div className='w-full p-1 cursor-pointer flex items-center justify-center bg-slate-200 rounded-lg' onClick={callToSignIn}>
+                    <p className='text-xs'>Have an account ?, click here to signin</p>
+                </div>
             </form>
         </Form>
     );
