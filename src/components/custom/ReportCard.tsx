@@ -17,6 +17,7 @@ import moment from 'moment';
 import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import { toast } from 'sonner';
+import { socket } from '@/lib/socket';
 
 interface ReportCardProps {
     id?: number;
@@ -69,7 +70,30 @@ const ReportCard = React.memo(({ id }: ReportCardProps) => {
 
     useEffect(() => {
         fetchAlert();
-    }, [fetchAlert]);
+
+        if (id && socket.connected) {
+            console.log("i am trying to join this room")
+            socket.emit('join_alert_room', id);
+        }
+
+        socket.on('alert_updated', (updatedAlert: AlertType) => {
+            console.log(updatedAlert)
+            setAlert(updatedAlert);
+            // Check if the current user has flagged
+            if (user) {
+                const hasFlag = updatedAlert.Flags.some(
+                    (flag: FlagType) => flag.UserID === user.id
+                );
+                setUserHasFlagged(hasFlag);
+            }
+        });
+
+        return () => {
+            socket.off('alert_updated');
+            socket.emit('leave_alert_room', id);
+        }
+
+    }, [fetchAlert, id, user]);
 
     const handleAction = async (type: 'Verify' | 'Dismiss') => {
         if (id && !userHasFlagged && user) {
