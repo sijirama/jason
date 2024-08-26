@@ -34,12 +34,16 @@ export default function ReportCardModal() {
         }
     }, [open, alertId]);
 
+    /*
+                        <DialogTitle>Alert Details</DialogTitle>
+                        <DrawerTitle>Alert Details</DrawerTitle>
+        */
+
     if (isDesktop) {
         return (
             <Dialog open={open} onOpenChange={onClose}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Alert Details</DialogTitle>
                         <DialogDescription></DialogDescription>
                     </DialogHeader>
                     {reportCardOpen && <ReportCard id={alertId} open={reportCardOpen} />}
@@ -53,7 +57,6 @@ export default function ReportCardModal() {
             <DrawerContent>
                 <div className="w-5/6 mx-auto mb-3 p-2">
                     <DrawerHeader className="text-left">
-                        <DrawerTitle>Alert Details</DrawerTitle>
                         <DrawerDescription></DrawerDescription>
                     </DrawerHeader>
                     {reportCardOpen && <ReportCard id={alertId} open={reportCardOpen} />}

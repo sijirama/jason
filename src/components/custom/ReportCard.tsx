@@ -126,6 +126,21 @@ const ReportCard = React.memo(({ id }: ReportCardProps) => {
         }
     };
 
+    const formatDescription = (description: string) => {
+        return description.split('\n').map((line, index) => (
+            <React.Fragment key={index}>
+                {line.trim()}
+                {index < description.split('\n').length - 1 && <br />}
+            </React.Fragment>
+        ));
+    };
+
+    const truncateDescription = (description: string, maxLines: number) => {
+        const lines = description.split('\n');
+        if (lines.length <= maxLines) return description;
+        return lines.slice(0, maxLines).join('\n') + '...';
+    };
+
     if (loading) {
         return (
             <div className="p-4">
@@ -153,13 +168,8 @@ const ReportCard = React.memo(({ id }: ReportCardProps) => {
                 : 'text-yellow-500';
     const formattedDate = moment(alert.CreatedAt).format('Do [of] MMM [around] h:mm A');
 
-    const truncateDescription = (text: string, maxLength: number) => {
-        if (text.length <= maxLength) return text;
-        return text.substr(0, maxLength) + '...';
-    };
-
     return (
-        <div className="p-4">
+        <div className="p-4 font-poppins">
             <div className="mb-3">
                 <div className="mb-2">
                     <h2 className="text-lg font-bold text-gray-800 mb-1">{alert.Title}</h2>
@@ -183,12 +193,12 @@ const ReportCard = React.memo(({ id }: ReportCardProps) => {
                     <Clock className="w-4 h-4" />
                     <span>Reported {formattedDate}</span>
                 </p>
-                <p className="text-gray-700">
+                <div className="text-gray-700 text-sm">
                     {isDescriptionExpanded
-                        ? alert.Description
-                        : truncateDescription(alert.Description, 100)}
-                </p>
-                {alert.Description.length > 100 && (
+                        ? formatDescription(alert.Description)
+                        : formatDescription(truncateDescription(alert.Description, 3))}
+                </div>
+                {alert.Description.split('\n').length > 3 && (
                     <Button
                         onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                         variant="ghost"
