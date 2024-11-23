@@ -31,18 +31,21 @@ pub const Tokenizer = struct {
                     try tokens.append(Token{ .type = TokenType.LEFT_BRACE, .value = value });
                     self.position += 1;
                 },
+
                 '}' => {
                     const value = try tokens.allocator.alloc(u8, 1);
                     value[0] = current;
                     try tokens.append(Token{ .type = TokenType.RIGHT_BRACE, .value = value });
                     self.position += 1;
                 },
+
                 ':' => {
                     const value = try tokens.allocator.alloc(u8, 1);
                     value[0] = current;
                     try tokens.append(Token{ .type = TokenType.COLON, .value = value });
                     self.position += 1;
                 },
+
                 ',' => {
                     const value = try tokens.allocator.alloc(u8, 1);
                     value[0] = current;
@@ -93,6 +96,7 @@ pub const Tokenizer = struct {
                     // Skip whitespace
                     self.position += 1;
                 },
+
                 '-', '0'...'9' => {
                     const allocator = std.heap.page_allocator;
                     var number = std.ArrayList(u8).init(allocator);
