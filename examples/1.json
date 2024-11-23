@@ -1,4 +1,7 @@
 {
-    "name": "Alice",
-    "age": 25
+    "name": "siji",
+    "age": 21,
+    "virgin": true,
+    "emploted": false,
+    "tags":["broke","useless"]
 }

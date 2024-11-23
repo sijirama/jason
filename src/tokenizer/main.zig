@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const TokenType = enum { LEFT_BRACE, RIGHT_BRACE, COLON, STRING, NUMBER, COMMA, EOF };
+pub const TokenType = enum { LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET, COLON, STRING, NUMBER, BOOLEAN, NULL, COMMA, EOF };
 
 pub const Token = struct {
     type: TokenType,
@@ -38,6 +38,19 @@ pub const Tokenizer = struct {
                     try tokens.append(Token{ .type = TokenType.RIGHT_BRACE, .value = value });
                     self.position += 1;
                 },
+                '[' => {
+                    const value = try tokens.allocator.alloc(u8, 1);
+                    value[0] = current;
+                    try tokens.append(Token{ .type = TokenType.LEFT_BRACKET, .value = value });
+                    self.position += 1;
+                },
+
+                ']' => {
+                    const value = try tokens.allocator.alloc(u8, 1);
+                    value[0] = current;
+                    try tokens.append(Token{ .type = TokenType.RIGHT_BRACKET, .value = value });
+                    self.position += 1;
+                },
 
                 ':' => {
                     const value = try tokens.allocator.alloc(u8, 1);
@@ -51,6 +64,41 @@ pub const Tokenizer = struct {
                     value[0] = current;
                     try tokens.append(Token{ .type = TokenType.COMMA, .value = value });
                     self.position += 1;
+                },
+
+                't' => { //INFO: wtf is even this colution bro, lmao
+                    if (self.position + 3 < self.input.len and
+                        self.input[self.position + 1] == 'r' and
+                        self.input[self.position + 2] == 'u' and
+                        self.input[self.position + 3] == 'e')
+                    {
+                        self.position += 4;
+                        const value = try tokens.allocator.dupe(u8, "true");
+                        try tokens.append(Token{ .type = TokenType.BOOLEAN, .value = value });
+                    }
+                },
+                'f' => { //INFO: wtf is even this colution bro, lmao
+                    if (self.position + 4 < self.input.len and
+                        self.input[self.position + 1] == 'a' and
+                        self.input[self.position + 2] == 'l' and
+                        self.input[self.position + 3] == 's' and
+                        self.input[self.position + 4] == 'e')
+                    {
+                        self.position += 5;
+                        const value = try tokens.allocator.dupe(u8, "false");
+                        try tokens.append(Token{ .type = TokenType.BOOLEAN, .value = value });
+                    }
+                },
+                'n' => {
+                    if (self.position + 3 < self.input.len and
+                        self.input[self.position + 1] == 'u' and
+                        self.input[self.position + 2] == 'l' and
+                        self.input[self.position + 3] == 'l')
+                    {
+                        self.position += 4;
+                        const value = try tokens.allocator.dupe(u8, "null");
+                        try tokens.append(Token{ .type = TokenType.NULL, .value = value });
+                    }
                 },
 
                 '"' => {
@@ -145,6 +193,9 @@ pub const Tokenizer = struct {
                 else => {},
             }
         }
+
+        const eof_value = try tokens.allocator.dupe(u8, "EOF");
+        try tokens.append(Token{ .type = TokenType.EOF, .value = eof_value });
         return tokens.toOwnedSlice();
     }
 };
