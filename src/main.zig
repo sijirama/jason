@@ -26,6 +26,9 @@ pub fn main() !void {
     };
 
     const tokens = try tokenizer.tokenize();
+    // catch |err| {
+    //     print("Error tokenizing: {any}", .{@errorName(err)});
+    // };
 
     defer {
         for (tokens) |token| {
