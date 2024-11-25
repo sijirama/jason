@@ -1,5 +1,6 @@
 const std = @import("std");
 const tkn = @import("tokenizer/main.zig");
+const prser = @import("parser/main.zig");
 const print = std.debug.print;
 
 pub fn main() !void {
@@ -39,4 +40,7 @@ pub fn main() !void {
     for (tokens) |token| {
         std.debug.print("Token Type: {}, Value: {s}\n", .{ token.type, token.value });
     }
+
+    // var parser = prser.Parser{ .tokens = tokens };
+    // try parser.parse();
 }
