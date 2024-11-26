@@ -15,17 +15,41 @@ pub const JsonValue = union(enum) {
     Null: void,
 };
 
+const ParserError = error{
+    UnexpectedTokensAfterParsing,
+    UnexpectedEndOfTokens,
+    UnexpectedToken,
+    ExpectedObjectStart,
+    ExpectedStringKey,
+    ExpectedColon,
+    OutOfMemory,
+    ExpectedString,
+    ExpectedNumber,
+    InvalidNumberFormat,
+    ExpectedBoolean,
+    InvalidBooleanValue,
+    ExpectedNull,
+};
+
 pub const Parser = struct {
     tokens: []Token,
     current: usize = 0,
 
-    pub fn parse(self: *Parser) !void {
-        self.parse();
+    pub fn parse(self: *Parser) !JsonValue {
+        // Start by parsing the first value
+        const value = try self.parseValue();
+
+        // Ensure no tokens are left after parsing
+        if (self.current < self.tokens.len) {
+            return ParserError.UnexpectedTokensAfterParsing;
+        }
+
+        return value;
     }
 
-    pub fn parseValue(self: *Parser) !void {
+    pub fn parseValue(self: *Parser) ParserError!JsonValue {
         if (self.current >= self.tokens.len) {
-            return error.UnexpectedEndOfTokens;
+            return ParserError.UnexpectedEndOfTokens;
         }
         const current_token = self.tokens[self.current];
         return switch (current_token.type) {
@@ -35,7 +59,7 @@ pub const Parser = struct {
             .NUMBER => self.parseNumber(),
             .BOOLEAN => self.parseBoolean(),
             .NULL => self.parseNull(),
-            else => error.UnexpectedToken,
+            else => ParserError.UnexpectedToken,
         };
     }
 
@@ -43,21 +67,21 @@ pub const Parser = struct {
         const current_token = self.tokens[self.current];
 
         if (current_token.type != TokenType.LEFT_BRACE) {
-            return error.ExpectedObjectStart;
+            return ParserError.ExpectedObjectStart;
         }
 
         // Move past the left brace
         self.current += 1;
 
-        const gpa = std.heap.GeneralPurposeAllocator(.{}){};
-        const allocator = gpa.allocator();
+        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
         defer _ = gpa.deinit();
+        const allocator = gpa.allocator();
 
         var map = std.StringHashMap(JsonValue).init(allocator);
 
         while (current_token.type != .RIGHT_BRACE) {
             if (self.tokens[self.current].type != .STRING) {
-                return error.ExpectedStringKey;
+                return ParserError.ExpectedStringKey;
             }
             // Store the key (need to duplicate the string)
             const key = try allocator.dupe(u8, self.tokens[self.current].value);
@@ -65,7 +89,7 @@ pub const Parser = struct {
 
             // Expect a colon
             if (self.tokens[self.current].type != .COLON) {
-                return error.ExpectedColon;
+                return ParserError.ExpectedColon;
             }
             self.current += 1;
 
@@ -98,9 +122,9 @@ pub const Parser = struct {
         //move past the left brace
         self.current += 1;
 
-        const gpa = std.heap.GeneralPurposeAllocator(.{}){};
-        const allocator = gpa.allocator();
+        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
         defer _ = gpa.deinit();
+        const allocator = gpa.allocator();
 
         var array = std.ArrayList(JsonValue).init(allocator);
 
@@ -118,26 +142,78 @@ pub const Parser = struct {
         }
 
         self.current += 1;
-        return JsonValue{ .Array = array.toOwnedSlice() };
+        return JsonValue{ .Array = try array.toOwnedSlice() };
     }
 
     fn parseString(self: *Parser) !JsonValue {
-        // TODO: Implement string parsing
-        return error.Unimplemented;
+        // Check if current token is actually a string
+        if (self.tokens[self.current].type != .STRING) {
+            return error.ExpectedString;
+        }
+
+        // Get the string value
+        const string_value = self.tokens[self.current].value;
+
+        // Move past the string token
+        self.current += 1;
+
+        // Return as JsonValue.String
+        return JsonValue{ .String = string_value };
     }
 
     fn parseNumber(self: *Parser) !JsonValue {
-        // TODO: Implement number parsing
-        return error.Unimplemented;
+        // Check if current token is actually a string
+        if (self.tokens[self.current].type != .NUMBER) {
+            return error.ExpectedNumber;
+        }
+
+        // Get the string value
+        const value = self.tokens[self.current].value;
+
+        // Parse the number
+        const number_value = std.fmt.parseFloat(f64, value) catch |err| {
+            std.debug.print("Number parsing error: {}\n", .{err});
+            return error.InvalidNumberFormat;
+        };
+
+        // Move past the string token
+        self.current += 1;
+
+        // Return as JsonValue.String
+        return JsonValue{ .Number = number_value };
     }
 
     fn parseBoolean(self: *Parser) !JsonValue {
-        // TODO: Implement boolean parsing
-        return error.Unimplemented;
+        if (self.tokens[self.current].type != .BOOLEAN) {
+            return error.ExpectedBoolean;
+        }
+
+        // Get the string value
+        const value = self.tokens[self.current].value;
+
+        // Determine boolean value
+        const bool_value = if (std.mem.eql(u8, value, "true"))
+            true
+        else if (std.mem.eql(u8, value, "false"))
+            false
+        else
+            return error.InvalidBooleanValue;
+
+        // Move past the boolean token
+        self.current += 1;
+
+        // Return as JsonValue.Boolean
+        return JsonValue{ .Boolean = bool_value };
     }
 
     fn parseNull(self: *Parser) !JsonValue {
-        // TODO: Implement null parsing
-        return error.Unimplemented;
+        if (self.tokens[self.current].type != .NULL) {
+            return error.ExpectedNull;
+        }
+
+        // Move past the null token
+        self.current += 1;
+
+        return JsonValue{ .Null = {} };
     }
 };

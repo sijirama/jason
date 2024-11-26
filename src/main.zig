@@ -41,6 +41,6 @@ pub fn main() !void {
         std.debug.print("Token Type: {}, Value: {s}\n", .{ token.type, token.value });
     }
 
-    // var parser = prser.Parser{ .tokens = tokens };
-    // try parser.parse();
+    var parser = prser.Parser{ .tokens = tokens };
+    _ = try parser.parse();
 }
