@@ -91,12 +91,15 @@ pub const Parser = struct {
         self.current += 1;
 
         var map = std.StringHashMap(JsonValue).init(self.allocator);
-        defer map.deinit();
+
+        // No defer here; memory is managed by the arena
+        //defer map.deinit();
 
         while (self.current < self.tokens.len and self.tokens[self.current].type != .RIGHT_BRACE) {
             if (self.tokens[self.current].type != .STRING) {
                 return ParserError.ExpectedStringKey;
             }
+
             // Store the key (need to duplicate the string)
             const key = try self.allocator.dupe(u8, self.tokens[self.current].value);
             defer self.allocator.free(key);
@@ -250,7 +253,15 @@ pub fn printJsonValue(value: JsonValue) void {
             std.debug.print("{{\n", .{});
             var it = map.iterator();
             while (it.next()) |entry| {
+
+                // make sure theres a value there
+                if (entry.key_ptr.len == 0) {
+                    std.debug.print("Invalid entry in map: key_ptr={any}, value_ptr={any}\n", .{ entry.key_ptr, entry.value_ptr });
+                    continue;
+                }
+
                 // Safely access the key
+                std.debug.print(" Entrypoint length: {d}\n", .{entry.key_ptr.len});
                 const key = entry.key_ptr.*;
                 std.debug.print("  \"{s}\": ", .{key});
 
