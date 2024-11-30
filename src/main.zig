@@ -8,7 +8,7 @@ pub fn main() !void {
     //INFO: read from our examples
     // - for readFile you must pass in a fixed size of buffer, so you must before hand know the size of the file
 
-    const path = "./examples/2.json";
+    const path = "./examples/1.json";
     const allocator = std.heap.page_allocator;
 
     // Dynamically allocate memory and read the file
@@ -16,7 +16,7 @@ pub fn main() !void {
     defer allocator.free(buffer); // Free memory after usage
 
     // Print the file content
-    //std.debug.print("File Content:\n {s} \n\n", .{buffer});
+    std.debug.print("File Content:\n {s} \n\n", .{buffer});
 
     //INFO: tokenize
     const Tokenizer = tkn.Tokenizer;
