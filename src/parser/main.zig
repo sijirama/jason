@@ -102,11 +102,11 @@ pub const Parser = struct {
 
             // Store the key (need to duplicate the string)
             const key = try self.allocator.dupe(u8, self.tokens[self.current].value);
-            defer self.allocator.free(key);
             self.current += 1;
 
             // Expect a colon
             if (self.tokens[self.current].type != .COLON) {
+                self.allocator.free(key);
                 return ParserError.ExpectedColon;
             }
             self.current += 1;
@@ -253,24 +253,14 @@ pub fn printJsonValue(value: JsonValue) void {
             std.debug.print("{{\n", .{});
             var it = map.iterator();
             while (it.next()) |entry| {
+                // Safely print the key as a string
+                std.debug.print("  \"{s}\": ", .{entry.key_ptr.*});
 
-                // make sure theres a value there
-                if (entry.key_ptr.len == 0) {
-                    std.debug.print("Invalid entry in map: key_ptr={any}, value_ptr={any}\n", .{ entry.key_ptr, entry.value_ptr });
-                    continue;
-                }
-
-                // Safely access the key
-                std.debug.print(" Entrypoint length: {d}\n", .{entry.key_ptr.len});
-                const key = entry.key_ptr.*;
-                std.debug.print("  \"{s}\": ", .{key});
-
-                // Safely access and print the value
+                // Safely print the value
                 printJsonValue(entry.value_ptr.*);
             }
             std.debug.print("}}\n", .{});
         },
-
         .Array => |arr| {
             std.debug.print("[\n", .{});
             for (arr) |item| {
