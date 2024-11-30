@@ -34,10 +34,27 @@ const ParserError = error{
 pub const Parser = struct {
     tokens: []Token,
     current: usize = 0,
+    arena: std.heap.ArenaAllocator,
+    allocator: std.mem.Allocator,
+
+    pub fn init(tokens: []Token, parent_allocator: std.mem.Allocator) Parser {
+        var arena = std.heap.ArenaAllocator.init(parent_allocator);
+        return Parser{
+            .tokens = tokens,
+            .current = 0,
+            .arena = arena,
+            .allocator = arena.allocator(),
+        };
+    }
 
     pub fn parse(self: *Parser) !JsonValue {
+
         // Start by parsing the first value
         const value = try self.parseValue();
+
+        // Debug print remaining tokens
+        std.debug.print("Remaining tokens: {d}\n", .{self.tokens.len - self.current});
+        std.debug.print("Parsed tokens: {d}\n", .{self.current});
 
         // Ensure no tokens are left after parsing
         if (self.current < self.tokens.len) {
@@ -73,18 +90,16 @@ pub const Parser = struct {
         // Move past the left brace
         self.current += 1;
 
-        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-        defer _ = gpa.deinit();
-        const allocator = gpa.allocator();
+        var map = std.StringHashMap(JsonValue).init(self.allocator);
+        defer map.deinit();
 
-        var map = std.StringHashMap(JsonValue).init(allocator);
-
-        while (current_token.type != .RIGHT_BRACE) {
+        while (self.current < self.tokens.len and self.tokens[self.current].type != .RIGHT_BRACE) {
             if (self.tokens[self.current].type != .STRING) {
                 return ParserError.ExpectedStringKey;
             }
             // Store the key (need to duplicate the string)
-            const key = try allocator.dupe(u8, self.tokens[self.current].value);
+            const key = try self.allocator.dupe(u8, self.tokens[self.current].value);
+            defer self.allocator.free(key);
             self.current += 1;
 
             // Expect a colon
@@ -100,9 +115,14 @@ pub const Parser = struct {
             try map.put(key, value);
 
             // Optional comma handling
-            if (self.tokens[self.current].type == .COMMA) {
+            if (self.current < self.tokens.len and self.tokens[self.current].type == .COMMA) {
                 self.current += 1;
             }
+        }
+
+        // Verify end of object
+        if (self.current >= self.tokens.len or self.tokens[self.current].type != .RIGHT_BRACE) {
+            return ParserError.UnexpectedToken;
         }
 
         // Move past the right brace
@@ -122,13 +142,10 @@ pub const Parser = struct {
         //move past the left brace
         self.current += 1;
 
-        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-        defer _ = gpa.deinit();
-        const allocator = gpa.allocator();
+        var array = std.ArrayList(JsonValue).init(self.allocator);
+        errdefer array.deinit();
 
-        var array = std.ArrayList(JsonValue).init(allocator);
-
-        while (current_token.type != .RIGHT_BRACKET) {
+        while (self.current < self.tokens.len and self.tokens[self.current].type != .RIGHT_BRACKET) {
             // Parse the value (which could be anything)
             const value = try self.parseValue();
 
@@ -136,9 +153,13 @@ pub const Parser = struct {
             try array.append(value);
 
             // Handle optional comma between elements
-            if (self.tokens[self.current].type == .COMMA) {
+            if (self.current < self.tokens.len and self.tokens[self.current].type == .COMMA) {
                 self.current += 1;
             }
+        }
+
+        if (self.current >= self.tokens.len or self.tokens[self.current].type != .RIGHT_BRACKET) {
+            return ParserError.UnexpectedToken;
         }
 
         self.current += 1;
@@ -216,4 +237,40 @@ pub const Parser = struct {
 
         return JsonValue{ .Null = {} };
     }
+
+    // When done, call arena.deinit() to free everything at once
+    pub fn deinit(self: *Parser) void {
+        self.arena.deinit();
+    }
 };
+
+pub fn printJsonValue(value: JsonValue) void {
+    switch (value) {
+        .Object => |map| {
+            std.debug.print("{{\n", .{});
+            var it = map.iterator();
+            while (it.next()) |entry| {
+                // Safely access the key
+                const key = entry.key_ptr.*;
+                std.debug.print("  \"{s}\": ", .{key});
+
+                // Safely access and print the value
+                printJsonValue(entry.value_ptr.*);
+            }
+            std.debug.print("}}\n", .{});
+        },
+
+        .Array => |arr| {
+            std.debug.print("[\n", .{});
+            for (arr) |item| {
+                printJsonValue(item);
+            }
+            std.debug.print("]\n", .{});
+        },
+
+        .String => |str| std.debug.print("\"{s}\"\n", .{str}),
+        .Number => |num| std.debug.print("{d}\n", .{num}),
+        .Boolean => |b| std.debug.print("{}\n", .{b}),
+        .Null => std.debug.print("null\n", .{}),
+    }
+}

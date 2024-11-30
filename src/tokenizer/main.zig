@@ -194,8 +194,6 @@ pub const Tokenizer = struct {
             }
         }
 
-        const eof_value = try tokens.allocator.dupe(u8, "EOF");
-        try tokens.append(Token{ .type = TokenType.EOF, .value = eof_value });
         return tokens.toOwnedSlice();
     }
 };

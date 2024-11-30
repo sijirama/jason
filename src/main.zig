@@ -16,7 +16,7 @@ pub fn main() !void {
     defer allocator.free(buffer); // Free memory after usage
 
     // Print the file content
-    std.debug.print("File Content:\n {s} \n\n", .{buffer});
+    //std.debug.print("File Content:\n {s} \n\n", .{buffer});
 
     //INFO: tokenize
     const Tokenizer = tkn.Tokenizer;
@@ -27,9 +27,7 @@ pub fn main() !void {
     };
 
     const tokens = try tokenizer.tokenize();
-    // catch |err| {
-    //     print("Error tokenizing: {any}", .{@errorName(err)});
-    // };
+    std.debug.print("Length of tokens: {d} \n\n", .{tokens.len});
 
     defer {
         for (tokens) |token| {
@@ -37,10 +35,13 @@ pub fn main() !void {
         }
         std.heap.page_allocator.free(tokens);
     }
-    for (tokens) |token| {
-        std.debug.print("Token Type: {}, Value: {s}\n", .{ token.type, token.value });
-    }
 
-    var parser = prser.Parser{ .tokens = tokens };
-    _ = try parser.parse();
+    // for (tokens) |token| {
+    //     std.debug.print("Token Type: {}, Value: {s}\n", .{ token.type, token.value });
+    // }
+
+    var parser = prser.Parser.init(tokens, allocator);
+    const parsed_value = try parser.parse();
+    defer parser.deinit();
+    prser.printJsonValue(parsed_value);
 }
