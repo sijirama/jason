@@ -53,8 +53,8 @@ pub const Parser = struct {
         const value = try self.parseValue();
 
         // Debug print remaining tokens
-        std.debug.print("Remaining tokens: {d}\n", .{self.tokens.len - self.current});
-        std.debug.print("Parsed tokens: {d}\n", .{self.current});
+        // std.debug.print("Remaining tokens: {d}\n", .{self.tokens.len - self.current});
+        // std.debug.print("Parsed tokens: {d}\n", .{self.current});
 
         // Ensure no tokens are left after parsing
         if (self.current < self.tokens.len) {
