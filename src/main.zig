@@ -15,3 +15,22 @@ pub fn main() !void {
 
     jason.printValue(queried);
 }
+
+pub fn testmain() !void {
+    const json_string =
+        \\{ "store": { "book": [
+        \\  { "title": "Book 1" },
+        \\  { "title": "Book 2" },
+        \\  { "title": "Book 3" },
+        \\  { "title": "Book 4" }
+        \\] } }
+    ;
+
+    const allocator = std.heap.page_allocator;
+
+    var jason = Jason.init(allocator, json_string);
+
+    const queried = try jason.query("$.store.book[3].title");
+
+    jason.printValue(queried); // "Book 4"
+}
