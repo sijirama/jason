@@ -30,3 +30,25 @@ if err != nil {
 inspired from here 
 - https://medium.com/@bradford_hamilton/building-a-json-parser-and-query-tool-with-go-8790beee239a
 - https://goessner.net/articles/JsonPath/
+
+## a week later and yh i did it.
+
+```zig
+pub fn main() !void {
+    const path = "./examples/3.json";
+    const allocator = std.heap.page_allocator;
+
+    const input = try std.fs.cwd().readFileAlloc(allocator, path, 1024);
+    defer allocator.free(input); // Free memory after usage
+
+    var jason = Jason.init(allocator, input);
+
+    const queried = try jason.query("$.store.book[3].title");
+
+    jason.printValue(queried);
+}
+```
+
+the code became even more worse, sorry about that, i'm just learning zig, but good news is i like it and i'm gonna keep using it.
+
+
